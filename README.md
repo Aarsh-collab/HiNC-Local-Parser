@@ -1,157 +1,127 @@
-A privacy-first, multi-PDF AI search tool. Upload any PDFs, ask real questions, get answers and one-click links—entirely local. Powered by LangChain, Ollama, Streamlit, and Chroma vector search.
+# 🤖 HiNC Local AI PDF Q&A System
 
-Features
-Upload multiple PDFs (any subject, any length)
+> **Semantic, multi-PDF search powered by local AI.**  
+> Upload any PDF. Ask real questions. Get instant answers & exact PDF links.  
+> **Runs fully local. No cloud.**
 
-Ask any question in plain English
+---
 
-Get direct answers (using a local LLM, not the cloud)
+## 🚩 **What Is This?**
 
-Semantic chunk retrieval (using nomic-embed-text embeddings)
+- Upload **any number of PDFs** (textbooks, notes, whatever)
+- **Ask in natural language:**  
+  _“Show me all calculus questions”_  
+  _“Find acid-base reactions”_
+- **AI searches across every doc:**  
+  - Finds matching passages by meaning, not just keywords  
+  - Returns: document name, page number, direct link to the right spot in the PDF
+- **Streamlit chat UI:**  
+  - See your Q/A history  
+  - Only links from your latest search appear (no clutter)
 
-Clickable links open matched PDF/page in browser
+---
 
-Streamlit chat UI shows full conversation
+## ⚡️ **How It Works**
 
-Only links from the latest answer are shown (no clutter)
+1. **Upload PDFs**  
+   PDFs go in `static/uploads/`
+2. **PDFs are chunked & embedded**  
+   - Uses `pymupdf` for text/page extraction  
+   - Text split into overlapping chunks  
+   - Each chunk embedded via **Ollama (`nomic-embed-text`)**
+3. **Semantic Indexing**  
+   - All chunks stored in a **Chroma** vector DB
+4. **Ask Anything**  
+   - Retriever returns most relevant chunks  
+   - Local LLM (**Ollama** `llama3.2`) answers, using only those chunks as context
+5. **Results**  
+   - See answer + matching PDF passages, page numbers, and one-click links  
+   - Click a link to open the PDF **right at the answer** (served by PDF.js)
 
-How it Works
-PDF Upload
+---
 
-User uploads one or more PDFs via the Streamlit UI
+## 🚀 **Getting Started**
 
-PDFs are saved to static/uploads/
-
-PDF Parsing & Chunking
-
-Each PDF is read page-by-page with PyMuPDF (pymupdf)
-
-Each page is split into overlapping text chunks (text_splitter)
-
-Chunks are stored with doc name, page, and chunk index
-
-Semantic Embedding & Index
-
-Each chunk is embedded using local Ollama (nomic-embed-text)
-
-Chunks + metadata are stored in a Chroma vectorstore
-
-Vectorstore is used to build a semantic retriever
-
-Chat Q&A
-
-User submits a question in chat
-
-Retriever finds the most semantically similar chunks across all PDFs
-
-These chunks are combined and fed as context to a local LLM (Ollama/llama3.2)
-
-The LLM generates a focused answer using only the returned context
-
-UI Output
-
-The chat interface shows the user’s question and AI answer (history is preserved)
-
-Only the most recent search’s matching document links are shown below the latest answer
-(links open the exact page in the PDF.js browser viewer)
-
-How To Run Locally
-Install dependencies
-
-bash
-Copy
-Edit
+**1. Install dependencies**
 pip install -r requirements.txt
-Start Streamlit app
 
-bash
-Copy
-Edit
+**2. Start the Streamlit app**
 streamlit run app.py
-Start PDF.js static server (in another terminal)
 
-bash
-Copy
-Edit
+**3. Serve PDF.js for links (in a separate terminal):**
 cd static
 python -m http.server 8502
-Go to http://localhost:8501 in your browser
 
-Project File Structure
-graphql
-Copy
-Edit
-.
-├── app.py                # Main Streamlit UI/app code
-├── llm.py                # Ollama retriever and chatbot code
-├── pdf_utils.py          # PDF chunking and reading logic
-├── static/
-│   └── uploads/          # Where uploaded PDFs are stored
-│   └── pdf.js/           # PDF.js web viewer
-├── requirements.txt
-└── README.md
-Key Functions (How It All Connects)
-get_texts(uploaded_file, doc_name)
-→ Extracts and chunks all text from each PDF page (using pymupdf), returns metadata for chunk, page, and doc
+**4. Open in your browser:**
+Go to http://localhost:8501
 
-build_retriever(chunks)
-→ Indexes all chunks with local Ollama embeddings, builds a Chroma vectorstore retriever
+---
 
-ollamaChatbot(question, context)
-→ Takes user’s question and top-matching context, feeds to local LLM for answer
+## 🧠 **Core Components**
 
-Chat logic (Streamlit)
+- **PDF Parsing:** `pymupdf`
+- **Semantic Embeddings:** Ollama (`nomic-embed-text`)
+- **Vector Store:** Chroma
+- **LLM Q&A:** Ollama (`llama3.2`)
+- **Frontend:** Streamlit + PDF.js
 
-Stores full conversation history in st.session_state.conversation
+---
 
-On each new question: appends a Q/A to the conversation, but only displays document links for the latest response
+## 💬 **How to Use**
 
-Tech Stack
-Python 3.10+
+1. **Upload multiple PDFs**  
+   (Math, Chem, Bio, notes, tests—anything with text)
 
-Streamlit — frontend and chat UI
+2. **Ask:**  
+   - _Show me all calculus questions_  
+   - _Find all acid-base reactions_
 
-PyMuPDF (pymupdf) — PDF reading/chunking
+3. **Get:**  
+   - **AI-generated answer**
+   - **Snippets from every matching PDF**, with:
+     - 📄 **Document name**
+     - 📑 **Page number**
+     - 🔗 **One-click “Open PDF” link** (opens exact page in PDF.js)
 
-LangChain — chaining and prompt templating
+---
 
-Ollama — local LLM and local embedding models
+## 🏆 **Why This Rocks**
 
-Chroma — vectorstore for semantic search
+- **Semantic search (not keywords)**
+- **Handles any doc set** (no template, no regex)
+- **Super simple UI**—drag, drop, chat
+- **Full privacy:** everything is on your machine
+- **No cloud, no API keys, no vendor lock-in**
 
-PDF.js — browser PDF viewer
+---
 
-Example Usage
-Upload 3 math, 3 chem, 3 bio PDFs (or any other mix)
+## ⚠️ **Notes & Gotchas**
 
-Ask:
+- Make sure **PDF.js is running on port 8502** for PDF links to work.
+- Requires **Ollama running with `llama3.2` and `nomic-embed-text` models.**
+- **Only the latest result’s links are shown** (old chat stays, but no link clutter).
+- Chunk size/overlap can be adjusted in `get_texts()` for performance/tuning.
 
-“Show me all calculus questions”
-or
-“Find all acid-base reactions”
+---
 
-Instantly get:
+## 📋 **Troubleshooting**
 
-The most relevant passages (from any PDF)
+- **PDF won’t open?**  
+  Check you’re serving `static/` at port 8502 and that PDF.js is in `static/pdf.js/`.
 
-Page numbers & document names
+- **No answer from AI?**  
+  Make sure Ollama is running, and the needed models are pulled.
 
-One-click “Open PDF” links (loads correct page in browser)
+- **Broken links or UI glitches?**  
+  Check file paths, server ports, and browser console for details.
 
-Notes & Gotchas
-No cloud, no external API calls. All AI, search, and file processing is 100% local.
+---
 
-PDF.js must be served locally at port 8502 for one-click links to work (see setup above).
+## 👨‍💻 **Credits & Contact**
 
-Chunking & embedding size can be tuned in get_texts() and text_splitter() for best results.
+- **Lead Dev:** Aarsh nandra
+- **Contact:** aarsh.singh2020@gmail.com
+- **Powered by:** LangChain, Streamlit, Ollama, PyMuPDF, Chroma
 
-Only current links shown: your chat Q/A history stays, but only the latest links render (no buildup).
+---
 
-Troubleshooting
-PDF not displaying?
-Make sure static/uploads/ and static/pdf.js/ exist and your static server is running.
-
-LLM not answering?
-Make sure Ollama is running with llama3.2 and nomic-embed-text models installed.
-
-Credits
