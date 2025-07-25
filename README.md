@@ -40,6 +40,50 @@
 
 ---
 
+## 🏗️ **File Structure**
+```
+├── app.py # Main Streamlit app code
+├── llm.py # Local LLM, retriever, embedding logic
+├── pdf_utils.py # PDF chunking/extraction
+├── static/
+│ └── uploads/ # Where PDFs get stored
+│ └── pdf.js/ # PDF.js viewer (for in-browser links)
+├── requirements.txt
+└── README.md
+```
+---
+
+## 📁 Static Folder Setup: PDF.js
+
+This project requires the full [PDF.js](https://github.com/mozilla/pdf.js/) distribution in `static/pdf.js/` for in-browser PDF viewing.
+
+### 🟢 How to Set Up PDF.js
+
+1. **Download PDF.js**  
+   - Go to [https://github.com/mozilla/pdf.js/releases](https://github.com/mozilla/pdf.js/releases)
+   - Download the latest release ZIP file (example: `pdfjs-<version>-dist.zip`)
+
+2. **Extract the entire ZIP.**
+
+3. **Copy the entire extracted contents into your `static/pdf.js/` directory.**  
+   - You should have all subfolders like `web/`, `build/`, `cmaps/`, etc., inside `static/pdf.js/`
+   - **Do NOT just copy the `web` folder—copy everything from the distribution ZIP.**
+
+4. **Check your structure:**  
+
+```
+static/
+├── pdf.js/
+│ ├── web/
+│ │ └── viewer.html
+│ ├── build/
+│ ├── cmaps/
+│ └── ...other PDF.js folders/files
+└── uploads/
+```
+
+---
+
 ## 🚀 **Getting Started**
 
 **1. Install dependencies**
